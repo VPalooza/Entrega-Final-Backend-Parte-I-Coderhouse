@@ -1,59 +1,53 @@
 import express from "express";
-import { createServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
-import indexRoutes from "./routes/index.js";
-import __dirname from "./tools/dirname.js";
-import handlebars from "express-handlebars";
-import viewRoutes from "./routes/view.routes.js";
-import productRoutes from "./routes/products.routes.js";
+import routes from "./routes/index.js";
 import path from "path";
+import { fileURLToPath } from "url";
+import { engine } from "express-handlebars";
+import { Server } from "socket.io";
+import http from "http";
+import socketHandler from "./tools/socket.js";
+import mongoose from "mongoose";
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 3000;
+
+const mongoUri =
+    process.env.MONGO_URI || "mongodb://localhost:27017/mydatabase";
+
+// Conectar a la base de datos
+mongoose
+    .connect(mongoUri)
+    .then(() => {
+        console.log("Connected to MongoDB");
+    })
+    .catch((err) => {
+        console.error("Failed to connect to MongoDB", err);
+    });
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.resolve(__dirname, "../public")));
+app.use("/", routes);
 
-// Configuración de Handlebars
+// Middleware para servir archivos estáticos
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "public")));
+
 app.engine(
     "hbs",
-    handlebars.engine({
-        extname: ".hbs",
+    engine({
+        extname: "hbs",
         defaultLayout: "main",
     })
 );
 
+// Configurar hbs
 app.set("view engine", "hbs");
-app.set("views", path.join(__dirname, "../views"));
+app.set("views", path.join(__dirname, "views"));
 
+const httpServer = http.createServer(app);
+const io = new Server(httpServer);
+socketHandler(io);
 
-// Rutas bajo /api
-app.use("/api", indexRoutes);
-app.use("/api/products", productRoutes);
-
-// Rutas de vista
-app.use("/", viewRoutes); // Coloca las rutas de vista al final para evitar conflictos
-
-// Ruta raíz
-app.get("/", (req, res) => {
-    res.send("Bienvenido a la API. Usa /api/carts o /api/products para acceder a los recursos.");
-});
-
-// Crear el servidor HTTP
-const server = createServer(app);
-
-// Configuración de Socket.io
-const io = new SocketIOServer(server);
-io.on("connection", (socket) => {
-    console.log("Conexión establecida", socket.id);
-
-    socket.on("disconnect", () => {
-        console.log("Cliente desconectado", socket.id);
-    });
-});
-
-// Iniciar el servidor
-server.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto http://localhost:${PORT}`);
+httpServer.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

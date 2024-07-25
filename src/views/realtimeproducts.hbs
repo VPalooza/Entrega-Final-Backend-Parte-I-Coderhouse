@@ -1,18 +1,82 @@
-<h1>
-    Vista de Productos en tiempo real
-</h1>
+<style>
+    .centered-form { max-width: 30%; margin: auto; }
 
-<table>
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Titulo</th>
-            <th>Precio</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+</style>
+<h1 class="centered-form asm-3 border rounded bg-light text-center">Crear
+    producto</h1>
+<div class="container">
+    <div class="centered-form p-3 border rounded bg-light">
+        <form id="productForm">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" required />
+            </div>
+            <div class="mb-3">
+                <label for="code" class="form-label">Code</label>
+                <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="code"
+                    required
+                />
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" class="form-control" id="price" required />
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="category"
+                    required
+                />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description
+                    (optional)</label>
+                <input type="text" class="form-control" id="description" />
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    id="stock"
+                    required
+                />
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        </form>
+    </div>
+</div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/main.js"></script>
+<div class="container">
+    <h1 class="centered-form p-4 border rounded bg-light text-center">Lista de
+        Productos</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Thumbnails</th>
+                </tr>
+            </thead>
+            <tbody id="productList">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-container" id="paginationContainer">
+
+    </div>
+</div>
+

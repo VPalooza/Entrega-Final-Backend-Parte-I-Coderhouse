@@ -1,8 +1,16 @@
-import { productManager } from "./ProductManager.js";
-import Cart from "../classes/Cart.js";
-import __dirname from "../tools/dirname.js";
-import fs from "fs";
-import path from "path";
+const fs = require('fs').promises;
+const path = require('path');
+
+const { v4: uuidv4 } = require('uuid');
+const CartRepository = require('../implementation/repository/CartRespository');
+const { ProductService } = require('../managers/products.service')
+const MODULE = 'Cart'
+const fileCart = path.resolve('src/datos/carts.json')
+const productFile = path.resolve('src/datos/products.json')
+
+const getData = async (file) => {
+    return await fs.readFile(file, 'utf8');
+}
 
 class CartManager {
     constructor(path) {
@@ -105,3 +113,5 @@ class CartManager {
 export const cartManager = new CartManager(
     path.resolve(__dirname, "./datos/carts.json")
 );
+
+module.exports.CartService = CartService
